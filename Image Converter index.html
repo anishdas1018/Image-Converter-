@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8"></meta>
+
+  <meta content="width=device-width, initial-scale=1" name="viewport"></meta>
+
+  <title>Image Converter Tool</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+
+    :root {
+
+      --bg-color: #0f172a;
+
+      --content-bg: #1e293b;
+
+      --text-color: #cbd5e1;
+
+      --input-bg: #273449;
+
+      --button-bg: #6366f1;
+
+      --link-color: #a5b4fc;
+
+    }
+
+    body {
+
+      margin: 0;
+
+      font-family: 'Segoe UI', sans-serif;
+
+      background-color: var(--bg-color);
+
+      color: var(--text-color);
+
+      display: flex;
+
+      flex-direction: column;
+
+      min-height: 100vh;
+
+    }
+
+    #mainContent {
+
+      flex: 1;
+
+      max-width: 500px;
+
+      margin: 20px auto;
+
+      padding: 20px;
+
+      background-color: var(--content-bg);
+
+      border-radius: 12px;
+
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+
+    }
+
+    input, select, button {
+
+      width: 100%;
+
+      margin-top: 10px;
+
+      padding: 12px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      font-size: 1rem;
+
+    }
+
+    input[type="file"] {
+
+      background-color: var(--input-bg);
+
+      color: var(--text-color);
+
+    }
+
+    button {
+
+      background-color: var(--button-bg);
+
+      color: white;
+
+      cursor: pointer;
+
+    }
+
+    #downloadLinks a {
+
+      display: block;
+
+      margin-top: 8px;
+
+      color: var(--link-color);
+
+    }
+
+    #watermark {
+
+      position: fixed;
+
+      top: 8px;
+
+      right: 12px;
+
+      font-size: 0.85rem;
+
+      color: var(--link-color);
+
+      user-select: none;
+
+    }
+
+    #adContainer, #adTopContainer {
+
+      text-align: center;
+
+      padding: 15px 0;
+
+    }
+
+    /* Branding section styling */
+
+    #branding {
+
+      max-width: 500px;
+
+      margin: 20px auto 40px auto;
+
+      padding: 15px;
+
+      background: var(--content-bg);
+
+      color: var(--text-color);
+
+      text-align: center;
+
+      border-radius: 10px;
+
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+      user-select: none;
+
+    }
+
+    #branding p {
+
+      margin: 6px 0;
+
+    }
+
+    #branding a {
+
+      color: var(--link-color);
+
+      text-decoration: none;
+
+      margin: 0 8px;
+
+      font-weight: 500;
+
+    }
+
+    #branding a:hover {
+
+      text-decoration: underline;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div id="watermark">Created by 👉 Sriman Anish Das</div>
+
+  <div id="adTopContainer">
+
+    <script type="text/javascript">
+
+      atOptions = {
+
+        'key' : '8163cefac8cd7af112f4a18de1367c1c',
+
+        'format' : 'iframe',
+
+        'height' : 50,
+
+        'width' : 320,
+
+        'params' : {}
+
+      };
+
+    </script>
+
+    <script src="//www.highperformanceformat.com/8163cefac8cd7af112f4a18de1367c1c/invoke.js" type="text/javascript"></script>
+
+  </div>
+
+  <div id="mainContent">
+
+    <h2>Image Converter Tool</h2>
+
+    <select id="conversionType">
+
+      <option value="jpgToPng">JPG to PNG</option>
+
+      <option value="pngToJpg">PNG to JPG</option>
+
+    </select>
+
+    <input accept="image/jpeg, image/png" id="imageInput" multiple="" type="file" />
+
+    <input id="resizeWidth" placeholder="Resize Width (optional)" type="number" />
+
+    <input id="resizeHeight" placeholder="Resize Height (optional)" type="number" />
+
+    <label><input id="addWatermark" type="checkbox" /> Add Watermark</label>
+
+    <button onclick="convertImages()">Convert</button>
+
+    <button onclick="downloadZip()">Download ZIP</button>
+
+    <button onclick="downloadPDF()">Download PDF</button>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <div id="downloadLinks"></div>
+
+  </div>
+
+  <div id="adContainer">
+
+    <script type="text/javascript">
+
+      atOptions = {
+
+        'key' : '8163cefac8cd7af112f4a18de1367c1c',
+
+        'format' : 'iframe',
+
+        'height' : 50,
+
+        'width' : 320,
+
+        'params' : {}
+
+      };
+
+    </script>
+
+    <script src="//www.highperformanceformat.com/8163cefac8cd7af112f4a18de1367c1c/invoke.js" type="text/javascript"></script>
+
+  </div>
+
+  <!-- Branding Section -->
+
+  <div id="branding">
+
+    <p>Created by <strong>Sriman Anish Das</strong></p>
+
+    <p>Tools crafted for creators and professionals</p>
+
+    <p>
+
+      <a href="https://www.example.com" rel="noopener noreferrer" target="_blank">Visit Website</a> |
+
+      <a href="https://twitter.com/srimananishdas" rel="noopener noreferrer" target="_blank">Twitter</a>
+
+    </p>
+
+  </div>
+
+  <script>
+
+    let convertedImages = [];
+
+    function convertImages() {
+
+      const input = document.getElementById('imageInput');
+
+      const canvas = document.getElementById('canvas');
+
+      const ctx = canvas.getContext('2d');
+
+      const downloadLinks = document.getElementById('downloadLinks');
+
+      const conversionType = document.getElementById('conversionType').value;
+
+      const resizeWidth = parseInt(document.getElementById('resizeWidth').value);
+
+      const resizeHeight = parseInt(document.getElementById('resizeHeight').value);
+
+      const watermark = document.getElementById('addWatermark').checked;
+
+      convertedImages = [];
+
+      downloadLinks.innerHTML = '';
+
+      Array.from(input.files).forEach((file, index) => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+          const img = new Image();
+
+          img.onload = function() {
+
+            let width = resizeWidth || img.width;
+
+            let height = resizeHeight || img.height;
+
+            canvas.width = width;
+
+            canvas.height = height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            if (watermark) {
+
+              ctx.font = `${Math.floor(width / 25)}px Arial`;
+
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+
+              ctx.textAlign = 'right';
+
+              ctx.fillText('Created by Sriman Anish Das', width - 10, height - 10);
+
+            }
+
+            let outputFormat = conversionType === 'jpgToPng' ? 'image/png' : 'image/jpeg';
+
+            let extension = conversionType === 'jpgToPng' ? 'png' : 'jpg';
+
+            const dataUrl = canvas.toDataURL(outputFormat);
+
+            const fileName = `converted_${index + 1}.${extension}`;
+
+            const a = document.createElement('a');
+
+            a.href = dataUrl;
+
+            a.download = fileName;
+
+            a.textContent = `Download ${fileName}`;
+
+            downloadLinks.appendChild(a);
+
+            convertedImages.push({ name: fileName, data: dataUrl });
+
+          };
+
+          img.src = e.target.result;
+
+        };
+
+        reader.readAsDataURL(file);
+
+      });
+
+    }
+
+    function downloadZip() {
+
+      if (convertedImages.length === 0) {
+
+        alert("Please convert images first!");
+
+        return;
+
+      }
+
+      const zip = new JSZip();
+
+      convertedImages.forEach((img) => {
+
+        const base64 = img.data.split(',')[1];
+
+        zip.file(img.name, base64, {base64: true});
+
+      });
+
+      zip.generateAsync({type:"blob"}).then(function(content) {
+
+        const link = document.createElement('a');
+
+        link.href = URL.createObjectURL(content);
+
+        link.download = "converted_images.zip";
+
+        link.click();
+
+      });
+
+    }
+
+    function downloadPDF() {
+
+      if (convertedImages.length === 0) {
+
+        alert("Please convert images first!");
+
+        return;
+
+      }
+
+      const { jsPDF } = window.jspdf;
+
+      const pdf = new jsPDF();
+
+      let y = 10;
+
+      convertedImages.forEach((img, i) => {
+
+        if (i > 0) pdf.addPage();
+
+        pdf.addImage(img.data, 'JPEG', 10, y, 180, 0);
+
+      });
+
+      pdf.save("converted_images.pdf");
+
+    }
+
+  </script>
+
+</body>
+
+</html>
